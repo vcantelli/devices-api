@@ -1,0 +1,5 @@
+enum DeviceState {
+  available
+  in_use @map("in-use")
+  inactive
+}
