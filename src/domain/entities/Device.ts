@@ -1,5 +1,13 @@
 import { DeviceState } from "../enums/DeviceState";
 
+export interface DeviceProps {
+  id: string;
+  name: string;
+  brand: string;
+  state: DeviceState;
+  createdAt: Date;
+}
+
 export class Device {
   public readonly id: string;
   public name: string;
@@ -7,34 +15,41 @@ export class Device {
   public state: DeviceState;
   public readonly createdAt: Date;
 
-  constructor(props: {
-    id: string;
-    name: string;
-    brand: string;
-    state: DeviceState;
-    createdAt: Date;
-  }) {
-    const { id, name, brand, state, createdAt } = props;
-
-    this.id = id;
-    this.name = name;
-    this.brand = brand;
-    this.state = state;
-    this.createdAt = createdAt;
+  constructor(props: DeviceProps) {
+    this.id = props.id;
+    this.name = props.name;
+    this.brand = props.brand;
+    this.state = props.state;
+    this.createdAt = props.createdAt;
   }
 
-  update(data: Partial<Pick<Device, "name" | "brand" | "state">>) {
-    if (this.state === DeviceState.IN_USE) {
-      if (data.name && data.name !== this.name) {
-        throw new Error("Cannot update name of a device in use.");
-      }
-      if (data.brand && data.brand !== this.brand) {
-        throw new Error("Cannot update brand of a device in use.");
-      }
-    }
+  public update(data: Partial<Pick<Device, "name" | "brand" | "state">>) {
+    this.ensureCanBeUpdated(data);
 
-    if (data.name) this.name = data.name;
-    if (data.brand) this.brand = data.brand;
-    if (data.state) this.state = data.state;
+    if (data.name !== undefined) this.name = data.name;
+    if (data.brand !== undefined) this.brand = data.brand;
+    if (data.state !== undefined) this.state = data.state;
+  }
+
+  public ensureCanBeDeleted(): void {
+    if (this.state === DeviceState.IN_USE) {
+      throw new Error("Cannot delete device that is in use");
+    }
+  }
+
+  private ensureCanBeUpdated(data: Partial<Pick<Device, "name" | "brand">>): void {
+    const tryingToChangeImmutableFields = data.name || data.brand;
+
+    if (this.state === DeviceState.IN_USE && tryingToChangeImmutableFields) {
+      throw new Error("Cannot change name or brand of a device that is in use");
+    }
+  }
+
+  public activate() {
+    this.state = DeviceState.IN_USE;
+  }
+
+  public deactivate() {
+    this.state = DeviceState.INACTIVE;
   }
 }

@@ -1,5 +1,4 @@
 import { IDeviceRepository } from "@/domain/repositories/IDeviceRepository";
-import { DeviceState } from "@/domain/enums/DeviceState";
 
 interface DeleteDeviceRequest {
   id: string;
@@ -12,9 +11,7 @@ export class DeleteDevice {
     const device = await this.repository.findById(request.id);
     if (!device) throw new Error("Device not found");
 
-    if (device.state === DeviceState.IN_USE) {
-      throw new Error("Cannot delete a device in use");
-    }
+    device.ensureCanBeDeleted();
 
     await this.repository.delete(device.id);
   }

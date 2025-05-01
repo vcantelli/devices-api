@@ -21,7 +21,7 @@ export class DeviceController {
       }
 
       const useCase = new CreateDevice(this.repository);
-      await useCase.execute({ name, brand, state });
+      await useCase.execute({ name, brand, state: state as DeviceState });
       return res.status(201).send();
     } catch (err: any) {
       return res.status(500).json({ error: err.message });
@@ -37,7 +37,12 @@ export class DeviceController {
       }
 
       const useCase = new UpdateDevice(this.repository);
-      await useCase.execute({ id: req.params.id, name, brand, state });
+      await useCase.execute({
+        id: req.params.id,
+        name,
+        brand,
+        state: state as DeviceState
+      });
       return res.status(204).send();
     } catch (err: any) {
       return res.status(500).json({ error: err.message });
