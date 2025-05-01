@@ -26,4 +26,4 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD ["node", "dist/src/main/server.js"]
+CMD ["node", "dist/main/server.js"]
