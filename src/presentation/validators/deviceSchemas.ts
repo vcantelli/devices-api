@@ -13,3 +13,14 @@ export const updateDeviceSchema = z.object({
   brand: z.string().min(1).optional(),
   state: deviceStateSchema.optional()
 });
+export const idParamSchema = z.object({
+  id: z.string().uuid("Invalid UUID")
+});
+
+export const brandParamSchema = z.object({
+  brand: z.string().min(1, "Brand is required")
+});
+
+export const stateParamSchema = z.object({
+  state: deviceStateSchema
+});
