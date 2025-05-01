@@ -1,5 +1,6 @@
 import { DeviceState } from "@/domain/enums/DeviceState";
 import { IDeviceRepository } from "@/domain/repositories/IDeviceRepository";
+import { AppError } from "@/shared/errors/AppError";
 
 interface UpdateDeviceRequest {
   id: string;
@@ -13,7 +14,7 @@ export class UpdateDevice {
 
   async execute(request: UpdateDeviceRequest): Promise<void> {
     const device = await this.repository.findById(request.id);
-    if (!device) throw new Error("Device not found");
+    if (!device) throw new AppError("Device not found", 404);
 
     device.update({
       name: request.name,

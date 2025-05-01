@@ -1,3 +1,4 @@
+import { AppError } from "@/shared/errors/AppError";
 import { DeviceState } from "../enums/DeviceState";
 
 export interface DeviceProps {
@@ -33,7 +34,7 @@ export class Device {
 
   public ensureCanBeDeleted(): void {
     if (this.state === DeviceState.IN_USE) {
-      throw new Error("Cannot delete device that is in use");
+      throw new AppError("Cannot delete device that is in use", 400);
     }
   }
 
@@ -41,7 +42,7 @@ export class Device {
     const tryingToChangeImmutableFields = data.name || data.brand;
 
     if (this.state === DeviceState.IN_USE && tryingToChangeImmutableFields) {
-      throw new Error("Cannot change name or brand of a device that is in use");
+      throw new AppError("Cannot change name or brand of a device that is in use", 400);
     }
   }
 
