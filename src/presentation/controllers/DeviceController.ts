@@ -8,13 +8,19 @@ import { GetAllDevices } from "@/application/use-cases/GetAllDevices";
 import { GetDevicesByBrand } from "@/application/use-cases/GetDevicesByBrand";
 import { GetDevicesByState } from "@/application/use-cases/GetDevicesByState";
 import { DeviceState } from "@/domain/enums/DeviceState";
+import { createDeviceSchema, updateDeviceSchema } from "../validators/deviceSchemas";
 
 export class DeviceController {
   private readonly repository = new PrismaDeviceRepository();
 
   create = async (req: Request, res: Response) => {
     try {
-      const { name, brand, state } = req.body;
+      const parsed = createDeviceSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: parsed.error.errors });
+      }
+
+      const { name, brand, state } = parsed.data;
 
       if (!Object.values(DeviceState).includes(state)) {
         return res.status(400).json({ error: "Invalid device state" });
@@ -30,7 +36,12 @@ export class DeviceController {
 
   update = async (req: Request, res: Response) => {
     try {
-      const { name, brand, state } = req.body;
+      const parsed = updateDeviceSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: parsed.error.errors });
+      }
+
+      const { name, brand, state } = parsed.data;
 
       if (state && !Object.values(DeviceState).includes(state)) {
         return res.status(400).json({ error: "Invalid device state" });
