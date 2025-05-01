@@ -18,6 +18,6 @@ model Device {
 
 enum DeviceState {
   available
-  in_use
+  in_use @map("in-use")
   inactive
 }

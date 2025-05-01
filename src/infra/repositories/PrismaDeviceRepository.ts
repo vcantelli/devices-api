@@ -2,7 +2,19 @@ import { prisma } from "../db/prisma";
 import { IDeviceRepository } from "@/domain/repositories/IDeviceRepository";
 import { Device } from "@/domain/entities/Device";
 import { DeviceState } from "@/domain/enums/DeviceState";
-import { Device as PrismaDevice, DeviceState as PrismaDeviceState } from "@prisma/client";
+import type { Device as PrismaDevice } from "@prisma/client";
+
+const DomainToPrismaState = {
+  "available": "available",
+  "in-use": "in_use",
+  "inactive": "inactive",
+} as const;
+
+const PrismaToDomainState = {
+  "available": "available",
+  "in_use": "in-use",
+  "inactive": "inactive",
+} as const;
 
 export class PrismaDeviceRepository implements IDeviceRepository {
   async create(device: Device): Promise<void> {
@@ -11,7 +23,7 @@ export class PrismaDeviceRepository implements IDeviceRepository {
         id: device.id,
         name: device.name,
         brand: device.brand,
-        state: device.state as PrismaDeviceState,
+        state: DomainToPrismaState[device.state],
         createdAt: device.createdAt,
       },
     });
@@ -23,7 +35,7 @@ export class PrismaDeviceRepository implements IDeviceRepository {
       data: {
         name: device.name,
         brand: device.brand,
-        state: device.state as PrismaDeviceState,
+        state: DomainToPrismaState[device.state],
       },
     });
   }
@@ -51,7 +63,9 @@ export class PrismaDeviceRepository implements IDeviceRepository {
 
   async findByState(state: DeviceState): Promise<Device[]> {
     const result = await prisma.device.findMany({
-      where: { state: state as PrismaDeviceState },
+      where: {
+        state: DomainToPrismaState[state],
+      },
     });
     return result.map(this.mapToDomain);
   }
@@ -61,7 +75,7 @@ export class PrismaDeviceRepository implements IDeviceRepository {
       id: data.id,
       name: data.name,
       brand: data.brand,
-      state: data.state as DeviceState,
+      state: PrismaToDomainState[data.state],
       createdAt: data.createdAt,
     });
   }
