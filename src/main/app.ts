@@ -23,4 +23,8 @@ app.use(express.json());
 app.use("/devices", deviceRoutes);
 app.use(errorHandler);
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 export { app };
